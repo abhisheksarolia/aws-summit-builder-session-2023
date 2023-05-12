@@ -9,10 +9,22 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@aws-amplify/ui-react-native": "^1.2.14",
+    "@react-native-async-storage/async-storage": "1.17.11",
+    "@react-native-community/netinfo": "9.3.7",
+    "@react-navigation/native": "^6.1.6",
+    "@react-navigation/native-stack": "^6.9.12",
+    "amazon-cognito-identity-js": "^6.2.0",
+    "aws-amplify": "^5.1.4",
+    "aws-amplify-react-native": "^7.0.2",
+    "core-js": "^3.30.1",
     "expo": "~48.0.15",
     "expo-status-bar": "~1.4.4",
     "react": "18.2.0",
-    "react-native": "0.71.7"
+    "react-native": "0.71.7",
+    "expo-clipboard": "~4.1.2",
+    "expo-constants": "~14.2.1",
+    "expo-image-picker": "~14.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

@@ -1,0 +1,29 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-snaptocodemapp-dev-120407-authRole",
+      "UnauthRoleArn": "arn:aws:iam::431927925795:role/amplify-snaptocodemapp-dev-120407-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::431927925795:role/amplify-snaptocodemapp-dev-120407-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-snaptocodemapp-dev-120407-deployment",
+      "UnauthRoleName": "amplify-snaptocodemapp-dev-120407-unauthRole",
+      "StackName": "amplify-snaptocodemapp-dev-120407",
+      "StackId": "arn:aws:cloudformation:us-east-1:431927925795:stack/amplify-snaptocodemapp-dev-120407/c7b6c610-e5bc-11ed-82cf-12bb04144d55",
+      "AmplifyAppId": "d2i42k7crhulmj"
+    },
+    "categories": {
+      "auth": {
+        "snaptocodemapp9da85eae": {}
+      },
+      "function": {
+        "S3Triggerc05f337c": {
+          "deploymentBucketName": "amplify-snaptocodemapp-dev-120407-deployment",
+          "s3Key": "amplify-builds/S3Triggerc05f337c-56627579776677583663-build.zip"
+        }
+      },
+      "storage": {
+        "s3a472e5e3": {}
+      }
+    }
+  }
+}
