@@ -3,9 +3,12 @@ import { useEffect, useState} from "react";
 import * as Clipboard from "expo-clipboard";
 import Constants from "expo-constants";
 import * as ImagePicker from "expo-image-picker";
-import { Button, View, Text, StyleSheet, TextInput, Alert } from 'react-native';
+import { Button, View, Text, StyleSheet, TextInput, Alert, ScrollView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ButtonN from './component/ButtonN';
+
+
 // import { withAuthenticator } from 'aws-amplify-react-native'
 import {
   Authenticator,
@@ -205,6 +208,7 @@ function SnapToCodeScreen({ navigation }) {
       onPress={() => navigation.navigate('Results')}
     />
     <Button onPress={signOut} title="Sign Out" />
+    
   
   </View>
   );
@@ -214,8 +218,10 @@ function CodeEditorScreen({ route, navigation }){
   const [text, setText] = useState(undefined);
   const [userData, setUserData] = useState(undefined);
   const [saveFlow, setSaveFlow] = useState(false);
+  const [helpText, setHelpText] = useState(undefined);
   // let [onceFlow, setOnceFlow] = useState(true);
   var responseData = {};
+  var promptData = {};
   // var temp = text
   const { mypassedprop} = route.params;  
   
@@ -241,18 +247,18 @@ function CodeEditorScreen({ route, navigation }){
   const getApiResponseWithFetch = async () => {
     const response = await fetch(apiUrl);
     const jsonData = await response.json();
-    console.log(jsonData);
-    //setText(jsonData);
-    console.log(typeof(jsonData));
+    // console.log(jsonData);
+    // //setText(jsonData);
+    // console.log(typeof(jsonData));
     // console.log(text);
     responseData = (JSON.parse(jsonData));
-    console.log(typeof(responseData.codeblock));
-    console.log(responseData.codeblock);
+    // console.log(typeof(responseData.codeblock));
+    // console.log(responseData.codeblock);
     console.log("Current text state:")
     console.log(text)
     setText(responseData.codeblock);
-    console.log("New text state:")
-    console.log(text)
+    // console.log("New text state:")
+    // console.log(text)
  
   };
   
@@ -264,8 +270,8 @@ function CodeEditorScreen({ route, navigation }){
     //   console.log(false)
     // }
     setUserData('');
-    console.log("Modified code:")
-    console.log(e)
+    // console.log("Modified code:")
+    // console.log(e)
     setUserData(e)
     setSaveFlow(false)
     // console.log(userData)
@@ -319,18 +325,67 @@ function CodeEditorScreen({ route, navigation }){
   
   const handleSubmission = () => {
     console.log("Current state before API POST:")
-    console.log(text)
+    // console.log(text)
     console.log(userData)
     // post to API new edited data 
     console.log("posting to API:")
     postBacktoAPI()
   }
   
+  const postPromptToAPI = async () => {
+    // console.log("About to post:")
+    // console.log(helpText);
+    const response = await fetch(apiUrl+'/codehelp', {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "prompt": helpText,
+        }),
+      });
+    const jsonData = await response.json();
+    console.log(jsonData);
+    console.log(typeof(jsonData.body));
+    //setSaveFlow(true);
+    setHelpText(jsonData.body)
+  }
   
-  return( <View style={styles.container}>
+  const getCodeHelp = () => {
+    console.log("Help text before API POST:")
+    console.log(helpText)
+    // post to API new edited data 
+    console.log("posting to API:")
+    postPromptToAPI()
+  }
+  
+  this.handleHelpTextChange = (e) => {
+    // console.log(e)
+    // if(isFocused()){
+    //   console.log(true)
+    // }else{
+    //   console.log(false)
+    // }
+    // console.log("Modified help text:")
+    // console.log(e)
+    setHelpText(e)
+    // setSaveFlow(false)
+    // console.log(userData)
+    //this.setUserData((recentData) => ({ ...recentData, [e.target.name]: e.target.value }));
+    // setUserData(e.target.value);
+  }
+  
+  
+    return(
+      
+    <ScrollView style={styles.contentContainer}>
             {saveFlow == true && <Text>Modified Code submitted ...</Text>}
-            <Button title="Fetch" onPress={getApiResponseWithFetch} />
-            <Button title="Save" onPress={handleSubmission} />
+            <View style={ styles.footerContainer } >
+              <Button title="Fetch" onPress={getApiResponseWithFetch} />
+              <Button title="Save" onPress={handleSubmission} />
+              <Button title="Help" onPress={getCodeHelp}/>
+            </View>
             <TextInput multiline={true} maxLength={100} value = {userData} defaultValue = {text} placeholder={'Code Editor'}
                 placeholderTextColor="white"
                 underlineColorAndroid="transparent"
@@ -338,14 +393,25 @@ function CodeEditorScreen({ route, navigation }){
                 // onSubmitEditing = {this.handleUserData}
                 onChangeText = {this.handleTextChange}
                 />
-      </View>
+            
+            <TextInput multiline={true} maxLength={100} value = {helpText} defaultValue = {''} placeholder={'Code Help'}
+                placeholderTextColor="white"
+                underlineColorAndroid="transparent"
+                style={styles.textInput}
+                onChangeText = {this.handleHelpTextChange}
+                
+                />
+            
+      </ScrollView>
+   
       );
 }
 
 function ResultsScreen({ route, navigation }) {
   const [resultData, setResultData] = useState(null);
+  const [awaitFlag, setAwaitFlag] = useState(true)
   // const MINUTE_MS = 10000;
-  const apiUrl = "https://bu54y2jp65.execute-api.us-east-1.amazonaws.com/dev/api";
+  const apiUrl = "https://bu54y2jp65.execute-api.us-east-1.amazonaws.com/dev/api/result";
   var responseData = {};
   
   // this.fetchExecutionResponse = () => {
@@ -384,15 +450,18 @@ function ResultsScreen({ route, navigation }) {
     responseData = (JSON.parse(jsonData));
     console.log(typeof(responseData.result));
     setResultData(responseData.result);
+    setAwaitFlag(false)
+    
+    }
  
-  };
+  ;
   
   
   if(resultData == null)
   {
     return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Awaiting Results ...</Text>
+        {awaitFlag && <Text> Awaiting Results ...</Text> }
       
     </View>
     );
@@ -400,9 +469,8 @@ function ResultsScreen({ route, navigation }) {
   }else{
     return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text> Execution Result: </Text>
-      <Text> {resultData}</Text>
-      
+      {resultData && <Text> {resultData} </Text>}
+
     </View>
    );
     
@@ -475,6 +543,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
   },
+  contentContainer: {
+    flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    backgroundColor: 'white',
+  },
   text: {
     backgroundColor: 'whitesmoke',
     color: '#4A90E2',
@@ -488,7 +562,25 @@ const styles = StyleSheet.create({
     padding: 10,
     width: '80%',
     height: '70%',
+    margin : '5%'
   },
   // btn:{align: 'top'},
+  footerContainer: {
+    // flex: 1/3,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  scrollView: {
+    height: '2%',
+    width: '100%',
+    // margin: 20,
+    alignSelf: 'center',
+    padding: 20,
+    borderWidth: 5,
+    borderRadius: 5,
+    borderColor: 'black',
+    backgroundColor: 'lightblue'
+  }
   
 })
